@@ -3,6 +3,8 @@ import cors from "cors";
 import config from "./config";
 import cookieParser from "cookie-parser";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
+import { notFoundRoute } from "./middlewares/notFound";
+import { authRoutes } from "./modules/auth/auth.route";
 
 const app : Application = express();
 
@@ -19,6 +21,10 @@ app.use(cookieParser());
 app.get("/", async (req: Request, res: Response) => {
     res.send("Welcome to GearUp Backend API");
 });
+
+app.use("/api/auth", authRoutes);
+
+app.use(notFoundRoute);
 
 app.use(globalErrorHandler);
 
