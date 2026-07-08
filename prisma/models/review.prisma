@@ -1,0 +1,17 @@
+
+model Review {
+    id String @id @default(uuid())
+    customerId String
+    gearItemId String
+    rating Int
+    comment String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    customer User @relation(fields: [customerId], references: [id])
+
+    gearItem GearItem @relation(fields: [gearItemId], references: [id])
+
+    @@unique([customerId, gearItemId])
+    @@map("reviews")
+}

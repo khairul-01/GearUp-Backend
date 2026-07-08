@@ -1,0 +1,40 @@
+
+enum UserRole {
+    CUSTOMER
+    PROVIDER
+    ADMIN
+}
+
+enum UserStatus {
+    ACTIVE
+    SUSPENDED
+}
+
+enum GearCondition {
+    NEW
+    USED
+}
+
+enum RentalStatus {
+    PLACED
+    CONFIRMED
+    PAID
+    PICKED_UP
+    RETURNED
+    CANCELLED
+}
+
+enum PaymentMethod {
+    CARD
+    MOBILE_BANKING
+}
+
+enum PaymentProvider {
+    STRIPE
+}
+
+enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+}
