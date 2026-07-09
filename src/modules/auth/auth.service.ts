@@ -64,7 +64,7 @@ const loginUser = async (payload: ILoginUser) => {
     const payloadForToken = {
         id: user.id,
         name: user.name,
-        emil: user.email,
+        email: user.email,
         role: user.role
     };
 
