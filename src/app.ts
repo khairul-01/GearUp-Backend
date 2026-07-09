@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import { notFoundRoute } from "./middlewares/notFound";
 import { authRoutes } from "./modules/auth/auth.route";
+import { adminRoutes } from "./modules/admin/admin.route";
 
 const app : Application = express();
 
@@ -23,6 +24,7 @@ app.get("/", async (req: Request, res: Response) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use(notFoundRoute);
 
