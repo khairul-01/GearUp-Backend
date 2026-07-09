@@ -1,7 +1,10 @@
+import { emitWarning } from "node:process";
 import config from "../../config";
 import { prisma } from "../../lib/prisma";
-import { IRegisterUser } from "./auth.interface";
+import { ILoginUser, IRegisterUser } from "./auth.interface";
 import bcrypt from "bcrypt";
+import { jwtUtils } from "../../utils/jwtHelpers";
+import { SignOptions } from "jsonwebtoken";
 
 const registerUser = async (userData: IRegisterUser) => {
     const isUserExists = await prisma.user.findUnique({
@@ -22,7 +25,6 @@ const registerUser = async (userData: IRegisterUser) => {
             email: userData.email,
             password: hashedPassword,
             phone: userData.phone,
-            profileImage: userData.profileImage,
             role: userData.role
         }
     });
@@ -38,8 +40,50 @@ const registerUser = async (userData: IRegisterUser) => {
     });
 
     return userSend;
-}
+};
+
+const loginUser = async (payload: ILoginUser) => {
+    const user = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: payload.email
+        }
+    });
+
+    // account status
+    if(user.status === "SUSPENDED") {
+        throw new Error("Your account has been suspended. Please contact support");
+    };
+
+    // compare password
+    const isPasswordMatched = await bcrypt.compare(payload.password, user.password);
+    if(!isPasswordMatched) {
+        throw new Error("Invalid password or mail")
+    };
+
+    // Generate jwt 
+    const payloadForToken = {
+        id: user.id,
+        name: user.name,
+        emil: user.email,
+        role: user.role
+    };
+
+    const accessToken = jwtUtils.createToken(
+        payloadForToken, 
+        config.jwt_access_token_secret,
+        config.jwt_access_token_expires_in as SignOptions
+    );
+
+    // Remove password from response
+    const {password, ...userWithoutPassword} = user;
+
+    return {
+        accessToken,
+        user: userWithoutPassword
+    };
+};
 
 export const authService = {
-    registerUser
+    registerUser,
+    loginUser
 };

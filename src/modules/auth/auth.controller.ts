@@ -17,6 +17,27 @@ const registerUser = catchAsync(async (req: Request, res: Response, next: NextFu
     })
 });
 
+const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const payload = req.body;
+
+    const result = await authService.loginUser(payload);
+
+    res.cookie("accessToken", result.accessToken, {
+        httpOnly: true,
+        secure: false, // true in production,
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24, // 1 day in milliseconds
+    });
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User logged in successfully",
+        data: result
+    })
+})
+
 export const authController = {
-    registerUser
+    registerUser,
+    loginUser
 }
