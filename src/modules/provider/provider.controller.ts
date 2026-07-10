@@ -33,7 +33,22 @@ const updateGearItem = catchAsync(async (req: Request, res: Response, next: Next
     });
 });
 
+const deleteGearItem = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const providerId = req.user?.id;
+    const gearId = req.params.gearId;
+
+    await providerService.deleteGearItem(gearId as string, providerId as string);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Gear item deleted successfully",
+        data: null
+    });
+});
+
 export const providerController = {
     createGearItem,
-    updateGearItem
+    updateGearItem,
+    deleteGearItem
 }

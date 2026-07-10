@@ -1,3 +1,4 @@
+import { RentalStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { ICreateGearItem, IUpdateGearItem } from "./provider.interface";
 
@@ -113,7 +114,52 @@ const updateGearItem = async (gearId: string, providerId: string, payload: IUpda
     return updatedGearItem;
 };
 
+const deleteGearItem = async (gearId: string, providerId: string) => {
+    // check gear item exists
+    const gearItem = await prisma.gearItem.findUnique({
+        where: {
+            id: gearId
+        }
+    });
+
+    if(!gearItem) {
+        throw new Error("Gear item not found");
+    }
+
+    // check if the provider owns this gear item
+    if(gearItem.providerId !== providerId) {
+        throw new Error("You are not the owner of this gear item. You only can delete your own gear items");
+    };
+
+    // check active rentals for this gear item
+    const activeRentals = await prisma.rentalOrder.findFirst({
+        where: {
+            gearItemId: gearId,
+            status: {
+                in: [
+                    RentalStatus.PLACED,
+                    RentalStatus.CONFIRMED,
+                    RentalStatus.PICKED_UP,
+                    RentalStatus.PAID
+                ]
+            }}
+    });
+
+    if(activeRentals) {
+        throw new Error("This gear item has active rentals. You cannot delete it until all rentals are completed or cancelled");
+    }
+
+    await prisma.gearItem.delete({
+        where: {
+            id: gearId
+        }
+    });
+
+    return null;
+};
+
 export const providerService = {
     createGearItem,
-    updateGearItem
+    updateGearItem,
+    deleteGearItem
 }
