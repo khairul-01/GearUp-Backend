@@ -7,6 +7,7 @@ import { notFoundRoute } from "./middlewares/notFound";
 import { authRoutes } from "./modules/auth/auth.route";
 import { adminRoutes } from "./modules/admin/admin.route";
 import { providerRoutes } from "./modules/provider/provider.route";
+import { rentalOrderRoutes } from "./modules/rental/rental.route";
 
 const app : Application = express();
 
@@ -27,6 +28,7 @@ app.get("/", async (req: Request, res: Response) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/provider", providerRoutes);
+app.use("/api/rentals", rentalOrderRoutes);
 
 app.use(notFoundRoute);
 
