@@ -25,9 +25,8 @@ const createRentalOrder = async (
   // check if requested quantity is available
   if (rentalData.quantity > gearItem.availableQuantity) {
     throw new Error("Requested quantity is not available for rental");
-  }
+  };
 
-  // date validation
   // convert rentalStartDate and rentalEndDate to Date objects if they are strings
   if (typeof rentalData.rentalStartDate === "string") {
     rentalData.rentalStartDate = new Date(rentalData.rentalStartDate);
@@ -35,7 +34,21 @@ const createRentalOrder = async (
   if (typeof rentalData.rentalEndDate === "string") {
     rentalData.rentalEndDate = new Date(rentalData.rentalEndDate);
   }
-  
+
+  // check duplicate rental orders unpaid by the same customer for the same gear item
+  const existingRentalOrder = await prisma.rentalOrder.findFirst({
+    where: {
+      customerId,
+      gearItemId: rentalData.gearItemId,
+      status: RentalStatus.PLACED,
+    },
+  });
+
+  if (existingRentalOrder) {
+    throw new Error("You already have an unpaid rental order for this gear item. Please complete the payment or cancel the existing order before placing a new one.");
+  }
+
+  // date validation
   if (rentalData.rentalStartDate >= rentalData.rentalEndDate) {
     throw new Error("Rental start date must be before rental end date");
   }
@@ -93,6 +106,83 @@ const createRentalOrder = async (
   return rentalOrder;
 };
 
+const getRentalOrders = async (customerId: string) => {
+  const rentalOrders = await prisma.rentalOrder.findMany({
+    where: {
+      customerId,
+    },
+
+    orderBy: {
+      rentalStartDate: "desc",
+    },
+
+    include: {
+      gearItem: {
+        include: {
+          category: true,
+
+          provider: {
+            select: {
+              id: true, 
+              name: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      },
+
+      payment: true,
+    },
+  });
+
+  return rentalOrders;
+};
+
+const getRentalOrderById = async (customerId: string, rentalOrderId: string) => {
+  const rentalOrder = await prisma.rentalOrder.findUnique({
+    where: {
+      id: rentalOrderId,
+    },
+
+    include: {
+      gearItem: {
+        include: {
+          category: true,
+          provider: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      },
+      customer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      payment: true,
+    },
+  });
+
+  if (!rentalOrder ) {
+    throw new Error("Rental order not found");
+  };
+
+  if (rentalOrder.customerId !== customerId) {
+    throw new Error("You are not authorized to view this rental order");
+  }
+
+  return rentalOrder;
+};
+
 export const rentalOrderService = {
   createRentalOrder,
+  getRentalOrders,
+  getRentalOrderById,
 };
