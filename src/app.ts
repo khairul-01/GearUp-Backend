@@ -8,6 +8,7 @@ import { authRoutes } from "./modules/auth/auth.route";
 import { adminRoutes } from "./modules/admin/admin.route";
 import { providerRoutes } from "./modules/provider/provider.route";
 import { rentalOrderRoutes } from "./modules/rental/rental.route";
+import { paymentRoutes } from "./modules/payment/payment.route";
 
 const app : Application = express();
 
@@ -16,6 +17,8 @@ app.use(cors({
     origin: config.app_url,
     credentials: true,
 }));
+
+app.use("/api/payments/confirm", express.raw({ type: "application/json" })); // For Stripe webhook
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,6 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/provider", providerRoutes);
 app.use("/api/rentals", rentalOrderRoutes);
+app.use("/api/payments", paymentRoutes); // For payment related routes
 
 app.use(notFoundRoute);
 
