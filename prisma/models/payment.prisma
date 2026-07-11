@@ -1,15 +1,16 @@
-
 model Payment {
-    id String @id @default(uuid())
-    rentalOrderId String @unique
-    transactionId String?
-    amount Float
-    provider PaymentProvider?
-    method PaymentMethod?
-    status PaymentStatus @default(PENDING)
-    paidAt DateTime?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id                String           @id @default(uuid())
+    rentalOrderId     String           @unique
+    transactionId     String?          @unique
+    checkoutSessionId String?          @unique
+    checkoutUrl       String?
+    amount            Decimal          @db.Decimal(10, 2)
+    provider          PaymentProvider?
+    method            PaymentMethod?
+    status            PaymentStatus    @default(PENDING)
+    paidAt            DateTime?
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
 
     rentalOrder RentalOrder @relation(fields: [rentalOrderId], references: [id])
 

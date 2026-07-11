@@ -5,6 +5,8 @@ import { paymentController } from "./payment.controller";
 
 const router = Router();
 
-router.post("/create", auth(UserRole.CUSTOMER), paymentController.createPaymentIntent);
+router.post("/create", auth(UserRole.CUSTOMER), paymentController.createCheckoutSession);
+
+router.post("/confirm", paymentController.confirmPayment);
 
 export const paymentRoutes = router;
