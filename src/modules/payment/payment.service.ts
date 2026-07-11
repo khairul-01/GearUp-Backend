@@ -8,7 +8,7 @@ import {
 import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import { stripe } from "../../lib/stripe";
-import { ICreatePaymentPayload } from "./payment.interface";
+import { ICreatePaymentPayload, IQueryMyPayments } from "./payment.interface";
 import { handlePaymentIntentSuccess } from "./payment.utils";
 import { stat } from "node:fs";
 
@@ -256,8 +256,99 @@ const confirmPayment = async (payload: Buffer, signature: string) => {
   }
 };
 
+const getMyPayments = async (customerId: string, query: IQueryMyPayments) => {
+    const page = query.page ? Number(query.page) || 1 : 1;
+    const limit = query.limit ? Number(query.limit) || 10 : 10;
+    const sortBy = query.sortBy || "createdAt";
+    const sortOrder = query.sortOrder === "desc" ? "desc" : "asc";
+
+    const skip = (page - 1) * limit;
+
+    const whereCondition = {
+        rentalOrder: {
+            customerId: customerId,
+        }
+    };
+
+    const [payments, total] = await prisma.$transaction([
+        prisma.payment.findMany({
+            where: whereCondition,
+            skip,
+            take: limit,
+            orderBy: {
+                [sortBy]: sortOrder,
+            },
+            include: {
+                rentalOrder: {
+                    include: {
+                        gearItem: {
+                            include: {
+                                category: true,
+                            }
+                        }
+                    },
+                }
+            },
+        }),
+        prisma.payment.count({
+            where: whereCondition,
+        })
+    ]);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        },
+        data: payments,
+    }
+};
+
+// Get a specific payment by ID for the authenticated customer
+const getPaymentById = async (customerId: string, paymentId: string) => {
+    const payment = await prisma.payment.findFirst({
+        where: {
+            id: paymentId,
+            rentalOrder: {
+                customerId: customerId
+            }
+        },
+        include: {
+            rentalOrder: {
+                include: {
+                    gearItem: {
+                        include: {
+                            category: true,
+                            provider: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    email: true,
+                                    phone: true,
+                                }
+                            }
+                        }
+                    },
+                    
+                },
+                
+            }
+        }
+    });
+
+    if (!payment) {
+        throw new Error("Payment not found or you do not have access to this payment.");
+    };
+
+    return payment;
+};
+
 export const paymentService = {
   createPaymentIntent,
   confirmPayment,
-  createPaymentSession
+  createPaymentSession,
+  getMyPayments,
+  getPaymentById
 };
