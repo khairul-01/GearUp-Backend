@@ -1,6 +1,7 @@
+import { Prisma } from "../../../generated/prisma/client";
 import { RentalStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
-import { ICreateGearItem, IUpdateGearItem } from "./provider.interface";
+import { ICreateGearItem, IUpdateGearItem, IUpdateGearItemStatus } from "./provider.interface";
 
 const createGearItem = async (providerId: string, payload: ICreateGearItem) => {
     // check category exists
@@ -158,8 +159,153 @@ const deleteGearItem = async (gearId: string, providerId: string) => {
     return null;
 };
 
-export const providerService = {
+const getProvidersOrders = async (providerId: string, query: Record<string, any>) => {
+    const page = query.page ? Number(query.page) : 1;
+    const limit = query.limit ? Number(query.limit) : 10;
+    const skip = (page - 1) * limit;
+
+    // in whereCondition set providerId 
+    const whereCondition: Prisma.RentalOrderWhereInput = {
+        gearItem: {
+            providerId: providerId
+        }
+    };
+
+    if (query.status) {
+        whereCondition.status = query.status as RentalStatus;
+    };
+
+    if (query.startDate && query.endDate) {
+        whereCondition.rentalStartDate = {
+            gte: new Date(query.startDate)
+        };
+        whereCondition.rentalEndDate = {
+            lte: new Date(query.endDate)
+        };
+    }
+
+    const [orders, totalCount] = await prisma.$transaction([
+        prisma.rentalOrder.findMany({
+            where: whereCondition,
+            skip,
+            take: limit,
+            orderBy: {
+                createdAt:"desc"
+            },
+            include: {
+                customer: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                },
+                gearItem: {
+                    include: {
+                        category: true
+                    }
+                },
+                payment: {
+                    select: {
+                        id: true,
+                        amount: true,
+                        status: true,
+                        provider: true,
+                        paidAt: true
+                    }
+                }
+            }
+        }),
+        prisma.rentalOrder.count({
+            where: whereCondition
+        })
+    ]);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total: totalCount,
+            totalPage: Math.ceil(totalCount / limit)
+        },
+        data: orders
+    };
+};
+
+const updateRentalOrderStatus = async (rentalOrderId: string, providerId: string, payload: IUpdateGearItemStatus) => {
+    // check rental order exists
+    const rentalOrder = await prisma.rentalOrder.findFirst({
+        where: {
+            id: rentalOrderId,
+            gearItem: {
+                providerId: providerId
+            }
+        },
+        include: {
+            gearItem: true
+        }
+    });
+
+    if(!rentalOrder) {
+        throw new Error("Rental order not found");
+    };
+
+    const currentStatus = rentalOrder.status;
+    const newStatus = payload.status;
+
+    // Allowed status transitions
+    const allowedTransitions: Record<RentalStatus, RentalStatus[]> = {
+        PLACED: ["CONFIRMED"],
+        CONFIRMED: [],
+        PAID: ["RETURNED"],
+        PICKED_UP: ["RETURNED"],
+        RETURNED: [],
+        CANCELLED: []
+    }
+
+    if (!allowedTransitions[currentStatus].includes(newStatus)) {
+        throw new Error(`[${currentStatus} -> ${newStatus}] Invalid status transition from ${currentStatus} to ${newStatus}. Allowed transitions: ${allowedTransitions[currentStatus].join(", ")}.`);
+    };
+
+    const updatedRentalOrder = await prisma.$transaction(async (tx) => {
+        // Update the rental order status
+        const updatedOrder = await tx.rentalOrder.update({
+            where: {
+                id: rentalOrderId
+            },
+            data: {
+                status: newStatus
+            },
+            include: {
+                customer: true,
+                gearItem: true,
+            }
+        });
+
+        // increase stock when the order is returned
+        if (newStatus === RentalStatus.RETURNED) {
+            await tx.gearItem.update({
+                where: {
+                    id: rentalOrder.gearItemId
+                },
+                data: {
+                    availableQuantity: {
+                        increment: rentalOrder.quantity
+                    }
+                }
+            });
+        }
+
+        return updatedOrder;
+    });
+
+    return updatedRentalOrder;
+};
+
+export const providerService = {    
     createGearItem,
     updateGearItem,
-    deleteGearItem
+    deleteGearItem,
+    getProvidersOrders,
+    updateRentalOrderStatus
 }
