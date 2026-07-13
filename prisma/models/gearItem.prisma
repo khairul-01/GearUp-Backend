@@ -1,19 +1,18 @@
-
 model GearItem {
-    id String @id @default(uuid())
-    providerId String
-    categoryId String
-    name String @db.VarChar(255)
-    description String
-    brand String
-    condition GearCondition
+    id                String        @id @default(uuid())
+    providerId        String
+    categoryId        String
+    name              String        @db.VarChar(255)
+    description       String
+    brand             String
+    condition         GearCondition
     rentalPricePerDay Float
-    quantity Int
+    quantity          Int
     availableQuantity Int
-    imageUrl String?
-    isAvailable Boolean @default(true)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    imageUrl          String?
+    isAvailable       Boolean       @default(true)
+    createdAt         DateTime      @default(now())
+    updatedAt         DateTime      @updatedAt
 
     provider User @relation(fields: [providerId], references: [id])
 

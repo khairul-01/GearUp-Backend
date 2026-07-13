@@ -14,18 +14,25 @@ const createRentalOrder = async (
   });
 
   if (!gearItem) {
-    throw new Error("Gear item with this ID does not exist");
+    // throw new Error("Gear item with this ID does not exist");
+    const error: any = new Error("Gear item with this ID does not exist");
+    error.statusCode = 404;
+    throw error;
   }
 
   // check if gear item is available
   if (!gearItem.isAvailable) {
-    throw new Error("Gear item is not available for rental");
+    const error: any = new Error("Gear item is not available for rental");
+    error.statusCode = 400;
+    throw error;
   }
 
   // check if requested quantity is available
   if (rentalData.quantity > gearItem.availableQuantity) {
-    throw new Error("Requested quantity is not available for rental");
-  };
+    const error: any = new Error("Requested quantity is not available for rental");
+    error.statusCode = 400;
+    throw error;
+  }
 
   // convert rentalStartDate and rentalEndDate to Date objects if they are strings
   if (typeof rentalData.rentalStartDate === "string") {
@@ -45,12 +52,16 @@ const createRentalOrder = async (
   });
 
   if (existingRentalOrder) {
-    throw new Error("You already have an unpaid rental order for this gear item. Please complete the payment or cancel the existing order before placing a new one.");
+    const error: any = new Error("You already have an unpaid rental order for this gear item. Please complete the payment or cancel the existing order before placing a new one.");
+    error.statusCode = 400;
+    throw error;
   }
 
   // date validation
   if (rentalData.rentalStartDate >= rentalData.rentalEndDate) {
-    throw new Error("Rental start date must be before rental end date");
+    const error: any = new Error("Rental start date must be before rental end date");
+    error.statusCode = 400;
+    throw error;
   }
 
   // total price calculation
@@ -171,11 +182,16 @@ const getRentalOrderById = async (customerId: string, rentalOrderId: string) => 
   });
 
   if (!rentalOrder ) {
-    throw new Error("Rental order not found");
+    const error: any = new Error("Rental order not found");
+    error.statusCode = 404;
+    throw error;
+    // throw new Error("Rental order not found");
   };
 
   if (rentalOrder.customerId !== customerId) {
-    throw new Error("You are not authorized to view this rental order");
+    const error: any = new Error("You are not authorized to view this rental order");
+    error.statusCode = 403;
+    throw error;
   }
 
   return rentalOrder;

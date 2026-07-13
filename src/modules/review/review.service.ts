@@ -14,11 +14,16 @@ const createReview = async (customerId: string, payload: ICreateReviewPayload) =
     });
 
     if (!rentalOrder) {
-        throw new Error("Rental order not found or you do not have access to this rental order.");
+        // throw new Error("Rental order not found or you do not have access to this rental order.");
+        const error: any = new Error("Rental order not found or you do not have access to this rental order.");
+        error.statusCode = 404;
+        throw error;
     };
 
     if (rentalOrder.status !== RentalStatus.RETURNED) {
-        throw new Error("You can only review a rental order only after that has been returned.");
+        const error: any = new Error("You can only review a rental order only after that has been returned.");
+        error.statusCode = 400;
+        throw error;
     };
 
     const existingReview = await prisma.review.findFirst({
@@ -28,7 +33,9 @@ const createReview = async (customerId: string, payload: ICreateReviewPayload) =
     });
 
     if (existingReview) {
-        throw new Error("You have already reviewed this rental order.");
+        const error: any = new Error("You have already reviewed this rental order.");
+        error.statusCode = 400;
+        throw error;
     }
 
     const review = await prisma.review.create({

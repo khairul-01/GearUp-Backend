@@ -12,7 +12,10 @@ const createGearItem = async (providerId: string, payload: ICreateGearItem) => {
     });
 
     if(!category) {
-        throw new Error("Category with this ID does not exist");
+        const error: any = new Error("Category with this ID does not exist");
+        error.statusCode = 404;
+        throw error;
+        // throw new Error("Category with this ID does not exist");
     }
 
     // check duplicate gear item
@@ -24,7 +27,9 @@ const createGearItem = async (providerId: string, payload: ICreateGearItem) => {
     });
 
     if(existingGearItem) {
-        throw new Error("Gear item with this name already exists in this category");
+        const error: any = new Error("Gear item with this name already exists in this category");
+        error.statusCode = 400;
+        throw error;
     };
 
     const gearItem = await prisma.gearItem.create({
@@ -67,12 +72,16 @@ const updateGearItem = async (gearId: string, providerId: string, payload: IUpda
     });
 
     if(!gearItem) {
-        throw new Error("Gear item not found");
+        const error: any = new Error("Gear item not found");
+        error.statusCode = 404;
+        throw error;
     }
 
     // check if the provider owns this gear item
     if(gearItem.providerId !== providerId) {
-        throw new Error("You are not the owner of this gear item");
+        const error: any = new Error("You are not the owner of this gear item");
+        error.statusCode = 403;
+        throw error;
     }
 
     // category validation
@@ -84,7 +93,9 @@ const updateGearItem = async (gearId: string, providerId: string, payload: IUpda
         });
 
         if (!category) {
-            throw new Error("Category with this ID does not exist");
+            const error: any = new Error("Category with this ID does not exist");
+            error.statusCode = 404;
+            throw error;
         }
     };
 
@@ -124,12 +135,16 @@ const deleteGearItem = async (gearId: string, providerId: string) => {
     });
 
     if(!gearItem) {
-        throw new Error("Gear item not found");
+        const error: any = new Error("Gear item not found");
+        error.statusCode = 404;
+        throw error;
     }
 
     // check if the provider owns this gear item
     if(gearItem.providerId !== providerId) {
-        throw new Error("You are not the owner of this gear item. You only can delete your own gear items");
+        const error: any = new Error("You are not the owner of this gear item. You only can delete your own gear items");
+        error.statusCode = 403;
+        throw error;
     };
 
     // check active rentals for this gear item
@@ -147,7 +162,9 @@ const deleteGearItem = async (gearId: string, providerId: string) => {
     });
 
     if(activeRentals) {
-        throw new Error("This gear item has active rentals. You cannot delete it until all rentals are completed or cancelled");
+        const error: any = new Error("This gear item has active rentals. You cannot delete it until all rentals are completed or cancelled");
+        error.statusCode = 400;
+        throw error;
     }
 
     await prisma.gearItem.delete({
@@ -247,7 +264,9 @@ const updateRentalOrderStatus = async (rentalOrderId: string, providerId: string
     });
 
     if(!rentalOrder) {
-        throw new Error("Rental order not found");
+        const error: any = new Error("Rental order not found");
+        error.statusCode = 404;
+        throw error;
     };
 
     const currentStatus = rentalOrder.status;
@@ -264,7 +283,9 @@ const updateRentalOrderStatus = async (rentalOrderId: string, providerId: string
     }
 
     if (!allowedTransitions[currentStatus].includes(newStatus)) {
-        throw new Error(`[${currentStatus} -> ${newStatus}] Invalid status transition from ${currentStatus} to ${newStatus}. Allowed transitions: ${allowedTransitions[currentStatus].join(", ")}.`);
+        const error: any = new Error(`[${currentStatus} -> ${newStatus}] Invalid status transition from ${currentStatus} to ${newStatus}. Allowed transitions: ${allowedTransitions[currentStatus].join(", ")}.`);
+        error.statusCode = 400;
+        throw error;
     };
 
     const updatedRentalOrder = await prisma.$transaction(async (tx) => {

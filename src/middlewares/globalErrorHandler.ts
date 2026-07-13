@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import { Prisma } from "../../generated/prisma/client";
 import config from "../config";
+import jwt from "jsonwebtoken";
 
 
 export const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
@@ -37,7 +38,13 @@ export const globalErrorHandler = (err: any, req: Request, res: Response, next: 
     } else if(err instanceof Prisma.PrismaClientUnknownRequestError) {
         statusCode = httpStatus.INTERNAL_SERVER_ERROR;
         errorMessage = "Error occurred during query execution. Please check your request and try again.";
-    } 
+    } else if(err instanceof jwt.JsonWebTokenError) {
+        statusCode = httpStatus.UNAUTHORIZED;
+        errorMessage = "Invalid token. Please log in again.";
+    } else if(err instanceof jwt.TokenExpiredError) {
+        statusCode = httpStatus.UNAUTHORIZED;
+        errorMessage = "Your token session has expired. Please log in again.";
+    }
 
     res.status(statusCode).json({
         success: false,

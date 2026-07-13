@@ -9,8 +9,6 @@ import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import { stripe } from "../../lib/stripe";
 import { ICreatePaymentPayload, IQueryMyPayments } from "./payment.interface";
-import { handlePaymentIntentSuccess } from "./payment.utils";
-import { stat } from "node:fs";
 
 const createPaymentIntent = async (
   customerId: string,
@@ -96,14 +94,18 @@ const createPaymentSession = async (
     });
 
     if (!rentalOrder) {
-      throw new Error(
+      const error: any = new Error(
         "Rental order not found. Please check the rental order ID.",
       );
+      error.statusCode = 404;
+      throw error;
     };
 
     // ownership check
     if (rentalOrder.customerId !== customerId) {
-      throw new Error("You are not the owner of this rental order.");
+      const error: any = new Error("You are not the owner of this rental order.");
+      error.statusCode = 403;
+      throw error;
     };
 
     // if(rentalOrder.status !== RentalStatus.CONFIRMED) {
@@ -119,7 +121,9 @@ const createPaymentSession = async (
     });
 
     if (existingPayment) {
-      throw new Error("A payment is already pending for this rental order.");
+      const error: any = new Error("A payment is already pending for this rental order.");
+      error.statusCode = 400;
+      throw error;
     };
 
     // create stripe checkout session
@@ -339,7 +343,9 @@ const getPaymentById = async (customerId: string, paymentId: string) => {
     });
 
     if (!payment) {
-        throw new Error("Payment not found or you do not have access to this payment.");
+        const error: any = new Error("Payment not found or you do not have access to this payment.");
+        error.statusCode = 404;
+        throw error;
     };
 
     return payment;
