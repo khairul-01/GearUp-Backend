@@ -1,6 +1,6 @@
 import Stripe from "stripe";
-import { prisma } from "../../lib/prisma";
-import { PaymentStatus, RentalStatus } from "../../../generated/prisma/enums";
+import { prisma } from "../../lib/prisma.js";
+import { PaymentStatus, RentalStatus } from "../../../generated/prisma/enums.js";
 
 export const handlePaymentIntentSuccess = async (
   paymentIntent: Stripe.PaymentIntent,

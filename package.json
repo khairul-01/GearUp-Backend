@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "postinstall": "prisma generate",
     "build": "tsc",
     "stripe": "stripe listen --forward-to localhost:5000/api/payments/confirm",
     "start": "node dist/server.js",

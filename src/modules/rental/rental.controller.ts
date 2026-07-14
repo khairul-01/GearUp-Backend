@@ -1,6 +1,6 @@
-import { catchAsync } from "../../utils/catchAsync";
-import { sendResponse } from "../../utils/sendResponse";
-import { rentalOrderService } from "./rental.service";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { sendResponse } from "../../utils/sendResponse.js";
+import { rentalOrderService } from "./rental.service.js";
 import httpStatus from "http-status";
 
 const createRentalOrder = catchAsync(async (req, res, next) => {

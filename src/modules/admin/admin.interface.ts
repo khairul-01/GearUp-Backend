@@ -1,4 +1,4 @@
-import { UserStatus } from "../../../generated/prisma/enums";
+import { UserStatus } from "../../../generated/prisma/enums.js";
 import { GearItemWhereInput, RentalOrderWhereInput, UserWhereInput } from "../../../generated/prisma/models";
 
 export interface ICreateCategory {

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { catchAsync } from "../../utils/catchAsync";
-import { adminService } from "./admin.service";
-import { sendResponse } from "../../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsync.js";
+import { adminService } from "./admin.service.js";
+import { sendResponse } from "../../utils/sendResponse.js";
 import httpStatus from "http-status";
 
 const createCategory = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

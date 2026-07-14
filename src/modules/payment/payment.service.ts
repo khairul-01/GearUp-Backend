@@ -4,11 +4,11 @@ import {
   PaymentProvider,
   PaymentStatus,
   RentalStatus,
-} from "../../../generated/prisma/enums";
-import config from "../../config";
-import { prisma } from "../../lib/prisma";
-import { stripe } from "../../lib/stripe";
-import { ICreatePaymentPayload, IQueryMyPayments } from "./payment.interface";
+} from "../../../generated/prisma/enums.js";
+import config from "../../config/index.js";
+import { prisma } from "../../lib/prisma.js";
+import { stripe } from "../../lib/stripe.js";
+import { ICreatePaymentPayload, IQueryMyPayments } from "./payment.interface.js";
 
 const createPaymentIntent = async (
   customerId: string,

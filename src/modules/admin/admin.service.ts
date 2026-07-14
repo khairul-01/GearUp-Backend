@@ -1,7 +1,7 @@
-import { UserRole, UserStatus } from "../../../generated/prisma/enums";
+import { UserRole, UserStatus } from "../../../generated/prisma/enums.js";
 import { GearItemWhereInput, RentalOrderWhereInput, UserWhereInput } from "../../../generated/prisma/models";
-import { prisma } from "../../lib/prisma";
-import { ICreateCategory, IGearQueryParams, IQueryParams, IRentalOrderQueryParams, IUpdateUserStatus } from "./admin.interface";
+import { prisma } from "../../lib/prisma.js";
+import { ICreateCategory, IGearQueryParams, IQueryParams, IRentalOrderQueryParams, IUpdateUserStatus } from "./admin.interface.js";
 
 const createCategory = async (payload: ICreateCategory) => {
     // check duplicate category
@@ -12,7 +12,9 @@ const createCategory = async (payload: ICreateCategory) => {
     });
 
     if(existingCategory) {
-        throw new Error("Category with this name already exists");
+        const error: any = new Error("Category with this name already exists");
+        error.statusCode = 400;
+        throw error;
     };
 
     const category = await prisma.category.create({
@@ -89,7 +91,9 @@ const getAllUsers = async (queryParams: IQueryParams) => {
 const updateUserStatus = async (userId: string, adminId: string, payload: IUpdateUserStatus) => {
     // prevent admin from updating their own status
     if (userId === adminId) {
-        throw new Error("You cannot update your own status");
+        const error: any = new Error("You cannot update your own status");
+        error.statusCode = 400;
+        throw error;
     }
 
     const user = await prisma.user.findUnique({
@@ -97,7 +101,9 @@ const updateUserStatus = async (userId: string, adminId: string, payload: IUpdat
     });
 
     if (!user) {
-        throw new Error("User not found");
+        const error: any = new Error("User not found");
+        error.statusCode = 404;
+        throw error;
     }
 
     const updatedUser = await prisma.user.update({

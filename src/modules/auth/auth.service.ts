@@ -1,9 +1,8 @@
-import { emitWarning } from "node:process";
-import config from "../../config";
-import { prisma } from "../../lib/prisma";
-import { ILoginUser, IRegisterUser } from "./auth.interface";
+import config from "../../config/index.js";
+import { prisma } from "../../lib/prisma.js";
+import { ILoginUser, IRegisterUser } from "./auth.interface.js";
 import bcrypt from "bcrypt";
-import { jwtUtils } from "../../utils/jwtHelpers";
+import { jwtUtils } from "../../utils/jwtHelpers.js";
 import { SignOptions } from "jsonwebtoken";
 
 const registerUser = async (userData: IRegisterUser) => {
@@ -14,7 +13,9 @@ const registerUser = async (userData: IRegisterUser) => {
     });
 
     if(isUserExists) {
-        throw new Error ("User with this email already exists");
+        const error: any = new Error ("User with this email already exists");
+        error.statusCode = 400;
+        throw error;
     };
 
     const hashedPassword = await bcrypt.hash(userData.password, Number(config.bcrypt_salt_rounds));
@@ -51,13 +52,17 @@ const loginUser = async (payload: ILoginUser) => {
 
     // account status
     if(user.status === "SUSPENDED") {
-        throw new Error("Your account has been suspended. Please contact support");
+        const error: any = new Error("Your account has been suspended. Please contact support");
+        error.statusCode = 403;
+        throw error;
     };
 
     // compare password
     const isPasswordMatched = await bcrypt.compare(payload.password, user.password);
     if(!isPasswordMatched) {
-        throw new Error("Invalid password or mail")
+        const error: any = new Error("Invalid password or email");
+        error.statusCode = 401;
+        throw error;
     };
 
     // Generate jwt 

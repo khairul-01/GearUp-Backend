@@ -1,16 +1,16 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
-import config from "./config";
+import config from "./config/index.js";
 import cookieParser from "cookie-parser";
-import { globalErrorHandler } from "./middlewares/globalErrorHandler";
-import { notFoundRoute } from "./middlewares/notFound";
-import { authRoutes } from "./modules/auth/auth.route";
-import { adminRoutes } from "./modules/admin/admin.route";
-import { providerRoutes } from "./modules/provider/provider.route";
-import { rentalOrderRoutes } from "./modules/rental/rental.route";
-import { paymentRoutes } from "./modules/payment/payment.route";
-import { reviewRoutes } from "./modules/review/review.route";
-import { gearRoutes } from "./modules/gear/gear.route";
+import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
+import { notFoundRoute } from "./middlewares/notFound.js";
+import { authRoutes } from "./modules/auth/auth.route.js";
+import { adminRoutes } from "./modules/admin/admin.route.js";
+import { providerRoutes } from "./modules/provider/provider.route.js";
+import { rentalOrderRoutes } from "./modules/rental/rental.route.js";
+import { paymentRoutes } from "./modules/payment/payment.route.js";
+import { reviewRoutes } from "./modules/review/review.route.js";
+import { gearRoutes } from "./modules/gear/gear.route.js";
 
 const app : Application = express();
 

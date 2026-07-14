@@ -1,7 +1,6 @@
-import { create } from "node:domain";
-import { GearItemWhereInput } from "../../../generated/prisma/models";
-import { prisma } from "../../lib/prisma";
-import { IGearQueryParams } from "./gear.interface";
+import { GearItemWhereInput } from "../../../generated/prisma/models.js";
+import { prisma } from "../../lib/prisma.js";
+import { IGearQueryParams } from "./gear.interface.js";
 
 const getAllGear = async (query: IGearQueryParams) => {
     const page = query.page ? Number(query.page) : 1;
@@ -131,7 +130,9 @@ const getGearById = async (gearId: string) => {
     });
 
     if (!gearItem) {
-        throw new Error("Gear item not found");
+        const error: any = new Error("Gear item not found");
+        error.statusCode = 404;
+        throw error;
     };
 
     // const totalReviews = gearItem.reviews.length;

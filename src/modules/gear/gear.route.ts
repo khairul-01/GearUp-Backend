@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { gearController } from "./gear.controller";
+import { gearController } from "./gear.controller.js";
 
 const router = Router();
 

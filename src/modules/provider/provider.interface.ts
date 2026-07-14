@@ -1,4 +1,4 @@
-import { GearCondition, RentalStatus } from "../../../generated/prisma/enums";
+import { GearCondition, RentalStatus } from "../../../generated/prisma/enums.js";
 
 export interface ICreateGearItem {
     categoryId: string;

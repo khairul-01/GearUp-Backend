@@ -1,6 +1,6 @@
-import { RentalStatus } from "../../../generated/prisma/enums";
-import { prisma } from "../../lib/prisma";
-import { ICreateReviewPayload } from "./review.interface";
+import { RentalStatus } from "../../../generated/prisma/enums.js";
+import { prisma } from "../../lib/prisma.js";
+import { ICreateReviewPayload } from "./review.interface.js";
 
 const createReview = async (customerId: string, payload: ICreateReviewPayload) => {
     const rentalOrder = await prisma.rentalOrder.findFirst({
