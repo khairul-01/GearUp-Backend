@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
-// import { Prisma } from "../../generated/prisma/client";
 import config from "../config/index.js";
 import jwt from "jsonwebtoken";
-import { Prisma } from "../../generated/prisma/client";
+import { Prisma } from "../../generated/prisma/client.js";
+import { ZodError } from "zod";
 
 
 export const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
@@ -12,6 +12,7 @@ export const globalErrorHandler = (err: any, req: Request, res: Response, next: 
     let statusCode = err.statusCode || 500;
     let errorMessage = err.message || "Internal Server Error";
     let errorName = err.name || "Internal Server Error";
+    let errorDetails: unknown = undefined;
 
     // Handle expected errors 
     if(err instanceof Prisma.PrismaClientValidationError) {
@@ -45,6 +46,13 @@ export const globalErrorHandler = (err: any, req: Request, res: Response, next: 
     } else if(err instanceof jwt.TokenExpiredError) {
         statusCode = httpStatus.UNAUTHORIZED;
         errorMessage = "Your token session has expired. Please log in again.";
+    } else if(err instanceof ZodError) {
+        statusCode = httpStatus.BAD_REQUEST;
+        errorMessage = "Invalid request data";
+        errorDetails = err.issues.map((issue) => ({
+            field: issue.path.join('.'),
+            message: issue.message
+        }));
     }
 
     res.status(statusCode).json({
@@ -52,6 +60,6 @@ export const globalErrorHandler = (err: any, req: Request, res: Response, next: 
         statusCode: statusCode || httpStatus.INTERNAL_SERVER_ERROR,
         name: errorName,
         message: errorMessage,
-        errorDetails: config.node_env === "development" ? err.stack : null
+        errorDetails: config.node_env === "development" ? errorDetails || err.stack : null
     })
 }

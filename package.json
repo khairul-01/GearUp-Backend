@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "build": "prisma generate && tsup",
     "postinstall": "prisma generate",
-    "build": "tsc",
     "stripe": "stripe listen --forward-to localhost:5000/api/payments/confirm",
     "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -38,6 +38,8 @@
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0",
-    "stripe": "^22.3.1"
+    "stripe": "^22.3.1",
+    "tsup": "^8.5.1",
+    "zod": "^4.4.3"
   }
 }

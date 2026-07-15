@@ -283,7 +283,8 @@ const updateRentalOrderStatus = async (rentalOrderId: string, providerId: string
     }
 
     if (!allowedTransitions[currentStatus].includes(newStatus)) {
-        const error: any = new Error(`[${currentStatus} -> ${newStatus}] Invalid status transition from ${currentStatus} to ${newStatus}. Allowed transitions: ${allowedTransitions[currentStatus].join(", ")}.`);
+        const error: any = new Error(`[${currentStatus} -> ${newStatus}] Invalid status transition from ${currentStatus} to ${newStatus}. Allowed transitions: ${allowedTransitions[currentStatus].join(", ")}`);
+
         error.statusCode = 400;
         throw error;
     };
