@@ -13,9 +13,6 @@ export const registerValidationSchema = z.object ({
         .string()
         .min(6, { message: "Password must be at least 6 characters long" }),
         role: z.enum(["CUSTOMER", "PROVIDER"]),
-        phone: z
-        .string()
-        .regex(/^\d{10}$/, { message: "Phone number must be 10 digits long" })
     })
 });
 

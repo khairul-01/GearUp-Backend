@@ -16,7 +16,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"hasan.rental@example.com\", \r\n    \"password\": \"Provider@123\"\r\n}\r\n// {\r\n//     \"email\": \"john.doe@gmail.com\",\r\n//     \"password\": \"12345678\"\r\n// }\r\n// {\r\n//     \"email\": \"admin.doe@gmail.com\",\r\n//     \"password\": \"admin12345678\"\r\n// }\r\n\r\n",
+              "raw": "// {\r\n//     \"email\": \"hasan.rental@example.com\", \r\n//     \"password\": \"Provider@123\"\r\n// }\r\n{\r\n    \"email\": \"john.doe@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n// {\r\n//     \"email\": \"admin.doe@gmail.com\",\r\n//     \"password\": \"admin12345678\"\r\n// }\r\n\r\n",
               "options": {
                 "raw": {
                   "language": "json"
@@ -264,7 +264,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"categoryId\": \"d2550c09-3faf-462e-8d98-6816f904f006\",\r\n  \"name\": \"4 Person Camping Tent\",\r\n  \"description\": \"Waterproof family camping tent with ventilation windows.\",\r\n  \"brand\": \"Coleman\",\r\n  \"condition\": \"NEW\",\r\n  \"rentalPricePerDay\": 350,\r\n  \"quantity\": 10\r\n}",
+              "raw": "{\r\n  \"categoryId\": \"d2550c09-3faf-462e-8d98-6816f904f006\",\r\n  \"name\": \"5 Person Camping Tent\",\r\n  \"description\": \"Waterproof 5 family camping tent with ventilation windows.\",\r\n  \"brand\": \"Coleman\",\r\n  \"condition\": \"NEW\",\r\n  \"rentalPricePerDay\": 350,\r\n  \"quantity\": 10\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -325,10 +325,10 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"categoryId\": \"d2550c09-3faf-462e-8d98-6816f904f006\",\r\n  \"name\": \"4 Person Camping Tent\",\r\n  \"description\": \"Waterproof family camping tent with ventilation windows.\",\r\n  \"brand\": \"Coleman\",\r\n  \"condition\": \"NEW\",\r\n  \"rentalPricePerDay\": 350,\r\n  \"quantity\": 10\r\n}"
+              "raw": ""
             },
             "url": {
-              "raw": "http://localhost:5000/api/provider/gear",
+              "raw": "http://localhost:5000/api/provider/gear/3a94e277-b39c-4fa8-803b-e8d2b6514765",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -337,7 +337,8 @@
               "path": [
                 "api",
                 "provider",
-                "gear"
+                "gear",
+                "3a94e277-b39c-4fa8-803b-e8d2b6514765"
               ]
             }
           },
@@ -414,7 +415,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"gearItemId\": \"ea60f7f8-10f1-4fa7-a9c6-aa1fa992c18e\",\r\n  \"quantity\": 2,\r\n  \"rentalStartDate\": \"2026-08-01\",\r\n  \"rentalEndDate\": \"2026-08-05\"\r\n}",
+              "raw": "{\r\n  \"gearItemId\": \"61b0c58a-08ef-4e6a-9e1a-8da92ffb8d8e\",\r\n  \"quantity\": 2,\r\n  \"rentalStartDate\": \"2026-08-01\",\r\n  \"rentalEndDate\": \"2026-08-05\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -489,7 +490,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "\r\n{\r\n  \"rentalOrderId\": \"b3c2dcc6-88a8-410c-a49a-65103dfc6a51\"\r\n}",
+              "raw": "\r\n{\r\n  \"rentalOrderId\": \"2d67a5f0-f268-4b22-920c-b2a4c9c1869c\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
